@@ -27,3 +27,9 @@ def extend_month_weekday(df_data):
         pl.col("datetime").dt.weekday().alias("weekday"),
         pl.col("datetime").dt.hour().alias("hour"),
     )
+def previous_value(df_data,day=7):
+    last_week = df_data[["county","is_business","product_type","datetime","is_consumption","target"]].with_columns(
+        (pl.col("datetime") + pl.duration(days=day)).alias("datetime"),
+    )
+    last_week = last_week.rename({"target":"last_week_target"})
+    return df_data.join(last_week,how="left",on=["county","is_business","product_type","datetime","is_consumption"])
